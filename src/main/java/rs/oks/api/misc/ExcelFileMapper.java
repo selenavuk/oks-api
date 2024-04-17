@@ -198,20 +198,8 @@ public class ExcelFileMapper {
     }
 
     private static IndexRange getIndexRangeOfLabel(List<String> labels, String label) {
-        IndexRange range = new IndexRange();
-
-        for (int i = 0; i < labels.size(); i++) {
-            String current = labels.get(i);
-
-                if (current.equals(label)) {
-                    range.setStartIndex(i);
-                } else {
-                    if (range.getStartIndex() != -1) {
-                        range.setEndIndex(i - 1);
-                    }
-                }
-        }
-        return range;
+        // TODO: add login to get this range dynamically
+        return new IndexRange(7, 20);
     }
 
     public static boolean hasExcelFormat(MultipartFile file) {

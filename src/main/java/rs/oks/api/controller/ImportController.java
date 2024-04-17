@@ -2,6 +2,7 @@ package rs.oks.api.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import rs.oks.api.misc.ExcelFileMapper;
@@ -43,8 +44,14 @@ public class ImportController {
 //    }
 
     @PostMapping("/spreadsheets")
-    @ResponseStatus(HttpStatus.OK)
-    public void uploadFile() throws GeneralSecurityException, IOException, ExecutionException, InterruptedException {
-        importService.updateUsersFromSpreadSheetsFile();
+    public ResponseEntity<String> uploadFile() throws GeneralSecurityException, IOException, ExecutionException, InterruptedException {
+        try {
+            importService.updateUsersFromSpreadSheetsFile();
+            return ResponseEntity
+                    .ok("Users successfully imported from Google Spread Sheets.");
+        } catch (Exception e) {
+            String errorMessage = "Error importing users from Google Spread Sheets: " + e.getMessage();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
+        }
     }
 }

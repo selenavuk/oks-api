@@ -1,5 +1,6 @@
 package rs.oks.api.service;
 
+import org.springframework.data.repository.query.Param;
 import rs.oks.api.model.User;
 import rs.oks.api.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -18,26 +20,54 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public User getUser(Integer id) {
+    public User getUserById(Integer id) {
         try {
-            return userRepository.findById(id).get();
+            Optional<User> userOptional = userRepository.findById(id);
+            return userOptional.orElse(null);
         } catch (Exception e) {
             System.out.println(Arrays.toString(e.getStackTrace()));
+            return null;
         }
-        return null;
     }
 
-//    public void updateUsersFromExcel(MultipartFile file) {
-//        try {
-//            List<User> users = ExcelHandler.readUsersFromExcelTable(file.getInputStream());
-//            userRepository.saveAll(users);
-//        } catch (IOException e) {
-//            // TODO: handle error
-//            throw new RuntimeException("fail to store excel data: " + e.getMessage());
-//        }
-//    }
-
-    public User addUser(User user){
-        return userRepository.save(user);
+    public User getUserByName(String firstName, String lastName) {
+        try {
+            Optional<User> userOptional = userRepository.findByName(firstName, lastName);
+            return userOptional.orElse(null);
+        } catch (Exception e) {
+            System.out.println(Arrays.toString(e.getStackTrace()));
+            return null;
+        }
     }
+
+    public List<User> getUserByUsername(String username) {
+        try {
+            return userRepository.findByUsername(username);
+        } catch (Exception e) {
+            System.out.println(Arrays.toString(e.getStackTrace()));
+            return null;
+        }
+    }
+
+    public void addUser(User user){
+        userRepository.save(user);
+    }
+
+    public void updateUserWithExcelData(User user) {
+        userRepository.updateUserWithExcelData(
+            user.getFirstName(),
+                user.getLastName(),
+                user.getDate(),
+                user.getPaymentMethod(),
+                user.getMembershipFee(),
+                user.getTotalTrainingSessions().toString(),
+                user.getPhoneNumber(),
+                user.getInViberGroup(),
+                user.getAccessCard(),
+                user.getHeight(),
+                user.getNote(),
+                user.getColorFlaggedInfo()
+        );
+    }
+
 }

@@ -6,12 +6,14 @@ import org.springframework.stereotype.Service;
 import rs.oks.api.misc.ExcelFileMapper;
 import rs.oks.api.misc.GoogleAuthorizeUtil;
 import rs.oks.api.model.User;
+import rs.oks.api.repository.TrainingSessionsRepository;
 import rs.oks.api.repository.UserRepository;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -19,7 +21,10 @@ import java.util.concurrent.ExecutionException;
 public class ImportService {
 
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
+
+    @Autowired
+    private TrainingSessionsRepository trainingSessionsRepository;
 
 //    public void updateUsersFromLocalExcelFile(MultipartFile file) {
 //        try {
@@ -33,10 +38,20 @@ public class ImportService {
 
     public void updateUsersFromSpreadSheetsFile() throws GeneralSecurityException, IOException, ExecutionException, InterruptedException {
         CompletableFuture<Credential> credentialFuture = authorizeAndFetchCredentialAsync();
-        credentialFuture.get();// TODO: This will block until the Credential is available - try to find solutions for this
+        credentialFuture.get(); // TODO: This will block until the Credential is available - try to find solutions for this
 
-        List<User> users = ExcelFileMapper.readUsersFromGoogleSpreadSheets();
-        userRepository.saveAll(Objects.requireNonNull(users));
+        updateUsers(ExcelFileMapper.readUsersFromGoogleSpreadSheets());
+    }
+
+    private void updateUsers(List<User> updatedUsers) {
+        for (User user : updatedUsers) {
+            User existingUser = userService.getUserByName(user.getFirstName(), user.getLastName());
+            if (existingUser == null) {
+                userService.addUser(user);
+            } else {
+                userService.updateUserWithExcelData(user);
+            }
+        }
     }
 
     public CompletableFuture<Credential> authorizeAndFetchCredentialAsync() throws GeneralSecurityException, IOException {
