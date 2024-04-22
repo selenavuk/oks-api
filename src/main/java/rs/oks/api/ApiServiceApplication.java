@@ -21,7 +21,8 @@ public class ApiServiceApplication {
 	}
 
 	private static boolean isRunningInProductionEnvironment() {
-		return System.getenv("ENVIRONMENT").equals("production");
+		String environment = System.getenv("ENVIRONMENT");
+		return environment != null && environment.equals("production");
 	}
 
 }
