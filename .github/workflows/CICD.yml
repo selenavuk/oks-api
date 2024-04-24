@@ -58,5 +58,5 @@ jobs:
 
       - name: deployment commands 
         run: |
-          aws ec2 ssh --instance-id i-024f151ab30d005a2 --region REGION_NAME eu-north-1
+          aws ec2-instance-connect ssh --instance-id i-024f151ab30d005a2              
 
