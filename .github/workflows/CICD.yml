@@ -49,4 +49,4 @@ jobs:
       - name: Build and Push Docker Image
         run: |
           sudo docker build -t oksapi:latest .
-          sudo docker push oksapi:latest
+          docker push selenavuk/oks-api-images:latest
