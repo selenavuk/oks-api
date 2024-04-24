@@ -59,7 +59,7 @@ jobs:
         script: |
           ls
           cd oks-api
-          docker pull selenavuk/oks-api-images:latest
+          sudo docker pull selenavuk/oks-api-images:latest
           # docker compose down
-          docker compose up -d 
+          sudo docker compose up -d 
           
