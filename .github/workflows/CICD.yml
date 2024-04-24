@@ -58,3 +58,8 @@ jobs:
         port: 22
         script: |
           ls
+          cd oks-api
+          docker pull selenavuk/oks-api-images:latest
+          # docker compose down
+          docker compose up -d 
+          
