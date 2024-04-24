@@ -50,10 +50,10 @@ jobs:
     needs: build_and_push_docker_image  
     steps:
       - name: executing remote ssh commands using password
-        uses: appleboy/ssh-action@v1.0.3
+        uses: easingthemes/ssh-deploy@v5.0.0
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             ls
