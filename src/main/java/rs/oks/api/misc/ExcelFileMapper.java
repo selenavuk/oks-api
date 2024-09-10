@@ -1,125 +1,115 @@
 package rs.oks.api.misc;
 
+import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.BatchGetValuesResponse;
+import com.google.api.services.sheets.v4.model.Sheet;
+import com.google.api.services.sheets.v4.model.Spreadsheet;
 import com.google.api.services.sheets.v4.model.ValueRange;
-import org.springframework.web.multipart.MultipartFile;
+import rs.oks.api.misc.classes.GoogleSpreadSheetsReadingResult;
 import rs.oks.api.misc.classes.IndexRange;
+import rs.oks.api.misc.classes.Labels;
 import rs.oks.api.model.User;
 import rs.oks.api.model.excelmodel.ExcelUser;
 import rs.oks.api.model.mapper.ExcelModelToModelMapper;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class ExcelFileMapper {
 
-    private static final String FILE_TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-    public static final String LABEL_NOTE = "Komentar";
-    public static final String LABEL_COLOR = "Boja";
-    public static final String LABEL_FIRST_NAME = "Ime";
-    public static final String LABEL_LAST_NAME = "Prezime";
-    public static final String LABEL_DATE = "Datum";
-    public static final String LABEL_PAYMENT_METHOD = "Keš/Banka";
-    public static final String LABEL_MEMBERSHIP_FEE = "Članarina";
-    public static final String LABEL_TRAINING_SESSIONS = "Prisutnost";
-    public static final String LABEL_TOTAL_TRAINING_SESSIONS = "Broj treninga";
-    public static final String LABEL_PHONE_NUMBER = "Viber broj";
-    public static final String LABEL_IN_VIBER_GROUP = "U viber grupi";
-    public static final String LABEL_ACCESS_CARD = "Pristupnica";
-    public static final String LABEL_HEIGHT = "Visina";
-    public static final String LABEL_TABLE_END = "Total";
+//    private static final String FILE_TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+//    private static final List<String> groupsToImport = Arrays.asList("mladja1", "mladja2", "srednja", "starija");
 
-    public static String SHEET_NAME = "Sheet1";
-    public static final String SHEET_ID = "1QdpovMV4e-b3HYCFLCdDJC_jb3bbQQaQ-AeYa6aGXBQ";
+    public static final String FILE_ID = "1QdpovMV4e-b3HYCFLCdDJC_jb3bbQQaQ-AeYa6aGXBQ";
 
-//    private static Sheets sheetsService;
+    public static GoogleSpreadSheetsReadingResult readContentFromGoogleSpreadSheets(Credential credential) throws GeneralSecurityException, IOException, ExecutionException, InterruptedException {
 
-//    public static List<User> readUsersFromExcelTable(InputStream inputStream, String tableName) {
-//        try (Workbook workbook = WorkbookFactory.create(inputStream)) {
-//
-//            Sheet sheet = workbook.getSheet(tableName);
-//
-////            getFileFromGoogleDrive();
-//
-//            Iterator<Row> rows = sheet.iterator();
-//            List<User> users = new ArrayList<User>();
-//
-//            int rowNumber = 0;
-//            while (rows.hasNext()) {
-//                Row currentRow = rows.next();
-//
-//                // skip headers
-//                if (rowNumber == 0) {
-//                    rowNumber++;
-//                } else {
-//
-//                    Iterator<Cell> cellsInRow = currentRow.iterator();
-//                    User user = new User();
-//
-//                    int cellIdx = 0;
-//                    while(cellsInRow.hasNext()) {
-//                        Cell currentCell = cellsInRow.next();
-//
-////                        switch (cellIdx) {
-////                            case 0:
-////                                user.setName(currentCell.getStringCellValue());
-////                                break;
-////                            case 1:
-////                                user.setUsername(currentCell.getStringCellValue());
-////                                break;
-////                            case 2:
-////                                user.setEmail(currentCell.getStringCellValue());
-////                                break;
-////                            case 3:
-////                                user.setPassword(currentCell.getStringCellValue());
-////                                break;
-////                            default:
-////                                break;
-////                        }
-//
-//                        Date date = new Date();
-//                        Timestamp timestamp = new Timestamp(date.getTime());
-//
-//                        user.setCreated_at(timestamp);
-//                        user.setUpdated_at(timestamp);
-//
-//                        user.setId(UUID.randomUUID().getLeastSignificantBits());
-//                        cellIdx++;
-//                    }
-//                    users.add(user);
-//                }
-//            }
-////            workbook.close();
-//            return users;
-//        } catch (Exception e) {
-//            // TODO: handle error
-//            return null;
-//        }
-//    }
+        // Get all sheets from the spreadsheet
+        Sheets file = GoogleSheetsServiceUtil.getSheets();
+        Spreadsheet spreadsheet = file.spreadsheets().get(FILE_ID).execute();
+        List<Sheet> sheets = spreadsheet.getSheets();
 
-    public static List<User> readUsersFromGoogleSpreadSheets() throws GeneralSecurityException, IOException, ExecutionException, InterruptedException {
-        BatchGetValuesResponse content = getFileFromGoogleDrive();
-        return ExcelModelToModelMapper.mapUsers(readContent(content));
+        // Determine which sheets to import
+        List<String> googleSpreadSheetNamesToImport = getGoogleSpreadSheetNamesToImport(sheets);
+
+        // Group sheets by age group
+        Pattern pattern = Pattern.compile("(mladja1|mladja2|srednja|starija)");
+        Map<String, List<String>> groupedSpreadSheetNames = googleSpreadSheetNamesToImport.stream()
+                .collect(Collectors.groupingBy(name -> {
+                    Matcher matcher = pattern.matcher(name);
+                    return matcher.find() ? matcher.group() : "";
+                }));
+
+        // Sort sheets in groups by month and year
+        Pattern datePattern = Pattern.compile("(\\d{2}_\\d{4})_(mladja1|mladja2|srednja|starija)");
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MM_yyyy");
+        Map<String, List<String>> sortedGroupedSpreadSheetNames = groupedSpreadSheetNames.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        e -> e.getValue().stream()
+                                .sorted(Comparator.comparing(name -> {
+                                    Matcher matcher = datePattern.matcher(name);
+                                    return matcher.find() ? YearMonth.parse(matcher.group(1), dateFormatter) : YearMonth.now();
+                                }))
+                                .collect(Collectors.toList())
+                ));
+
+        // Map that will hold sheet name to the list of users from corresponding sheet
+        Map<String, List<User>> hashMap = new HashMap<>();
+
+        // Access a single age group at a time
+        for (Map.Entry<String, List<String>> entry : sortedGroupedSpreadSheetNames.entrySet()) {
+            List<String> sheetNames = entry.getValue();
+
+            // Access a single sheet from an age group at a time
+            for (String sheetName : sheetNames) {
+
+                // Get sheet content
+                BatchGetValuesResponse sheetContent = file
+                        .spreadsheets()
+                        .values()
+                        .batchGet(FILE_ID)
+                        .setRanges(List.of(sheetName + "!A1:AY1000"))
+                        .execute();
+
+                // Map sheet content to users
+                List<User> sheetUsers = ExcelModelToModelMapper.mapUsers(readContent(sheetContent, sheetName));
+                hashMap.put(sheetName, sheetUsers);
+            }
+        }
+
+        return new GoogleSpreadSheetsReadingResult(hashMap, sortedGroupedSpreadSheetNames);
     }
 
-    private static BatchGetValuesResponse getFileFromGoogleDrive () throws GeneralSecurityException, IOException, ExecutionException, InterruptedException {
-        Sheets sheets = GoogleSheetsServiceUtil.getSheets();
-        return sheets.spreadsheets().values()
-                .batchGet(SHEET_ID)
-                .setRanges(List.of("A1:Z1000"))
-                .execute();
+    public static List<String> getGoogleSpreadSheetNamesToImport(List<Sheet> sheets) {
+        List<String> googleSpreadSheetNames = new ArrayList<>();
+        String regex = "\\d{2}_\\d{4}_(mladja1|mladja2|srednja|starija)";
+
+        for (Sheet sheet : sheets) {
+            String sheetName = sheet.getProperties().getTitle();
+            if (sheetName.matches(regex)) {
+                googleSpreadSheetNames.add(sheetName);
+            }
+        }
+        return googleSpreadSheetNames;
     }
 
-    private static List<ExcelUser> readContent(BatchGetValuesResponse content) {
+    private static List<ExcelUser> readContent(BatchGetValuesResponse content, String sheetName) {
         List<ValueRange> valueRanges = content.getValueRanges();
         List<List<Object>> rows = valueRanges.get(0).getValues();
 
         for (int i = 0; i < rows.size(); i++) {
-            if ( rows.get(i).get(2).toString().equals(LABEL_TABLE_END)) {
+            if ( rows.get(i).get(2).toString().equals(Labels.TABLE_END)) {
                 rows = rows.subList(0, i);
                 break;
             }
@@ -130,7 +120,7 @@ public class ExcelFileMapper {
 
         // Exclude the first row (labels rows)
         for (List<Object> row : rows.subList(1, rows.size())) {
-                users.add(mapUserFromRow(row, labels));
+                users.add(mapUserFromRow(row, labels, sheetName));
         }
 
         return users;
@@ -144,48 +134,84 @@ public class ExcelFileMapper {
                 .toList();
     }
 
-    private static ExcelUser mapUserFromRow(List<Object> row, List<String> labels) {
+    private static ExcelUser mapUserFromRow(List<Object> rawRow, List<String> labels, String sheetName) {
+
+        List<Object> row = new ArrayList<>(Collections.nCopies(51, ""));
+        for (int i = 0; i < rawRow.size(); i++) {
+            row.set(i, rawRow.get(i));
+        }
+
         ExcelUser user = new ExcelUser();
 
-        user.setNote(getFieldValueFromRow(row, labels, LABEL_NOTE));
-        user.setColorFlaggedInfo(getFieldValueFromRow(row, labels, LABEL_COLOR));
-        user.setFirstName(getFieldValueFromRow(row, labels, LABEL_FIRST_NAME));
-        user.setLastName(getFieldValueFromRow(row, labels, LABEL_LAST_NAME));
-        user.setDate(getFieldValueFromRow(row, labels, LABEL_DATE));
-        user.setPaymentMethod(getFieldValueFromRow(row, labels, LABEL_PAYMENT_METHOD));
-        user.setMembershipFee(getFieldValueFromRow(row, labels, LABEL_MEMBERSHIP_FEE));
-        user.setTrainingSessions(getTrainingSessionsFromRow(row, labels, LABEL_TRAINING_SESSIONS));
-        user.setTotalTrainingSessions(Integer.parseInt(getFieldValueFromRow(row, labels, LABEL_TOTAL_TRAINING_SESSIONS)));
-        user.setPhoneNumber(getFieldValueFromRow(row, labels, LABEL_PHONE_NUMBER));
-        user.setInViberGroup(getFieldValueFromRow(row, labels, LABEL_IN_VIBER_GROUP));
-        user.setAccessCard(getFieldValueFromRow(row, labels, LABEL_ACCESS_CARD));
-        user.setHeight(getFieldValueFromRow(row, labels, LABEL_HEIGHT));
+        user.setNote(getFieldValueFromRow(row, labels, Labels.NOTE));
+        user.setAgeGroup(sheetName.substring(sheetName.lastIndexOf("_") + 1));
+        user.setFirstName(getFieldValueFromRow(row, labels, Labels.FIRST_NAME));
+        user.setLastName(getFieldValueFromRow(row, labels, Labels.LAST_NAME));
+        user.setDate(getFieldValueFromRow(row, labels, Labels.DATE));
+        user.setDateofBirth(getFieldValueFromRow(row, labels, Labels.DATE_OF_BIRTH));
+        user.setDateDoctorReview(getFieldValueFromRow(row, labels, Labels.DATE_DOCTOR_REVIEW));
+        user.setPaymentMethod(getFieldValueFromRow(row, labels, Labels.PAYMENT_METHOD));
+        user.setMembershipFee(getFieldValueFromRow(row, labels, Labels.MEMBERSHIP_FEE));
+        user.setPayments(getFieldValueFromRow(row, labels, Labels.MEMBERSHIP_FEE));
+        user.setComments(getCommentsFromRow(row));
+        user.setTrainingSessions(getTrainingSessionsFromRow(row, labels, Labels.TRAINING_SESSIONS));
+        user.setMembershipFees(getFieldValueFromRow(row, labels, Labels.MEMBERSHIP_FEE_CAMP));
+        user.setTotalTrainingSessions(Integer.parseInt(getFieldValueFromRow(row, labels, Labels.TOTAL_TRAINING_SESSIONS)));
+        user.setPhoneNumber(getFieldValueFromRow(row, labels, Labels.PHONE_NUMBER));
+        user.setInViberGroup(getFieldValueFromRow(row, labels, Labels.IN_VIBER_GROUP));
+        user.setAccessCard(getFieldValueFromRow(row, labels, Labels.ACCESS_CARD));
+        user.setHeight(getFieldValueFromRow(row, labels, Labels.HEIGHT));
+        user.setEmail(getFieldValueFromRow(row, labels, Labels.USERNAME));
+        user.setPassword(getFieldValueFromRow(row, labels, Labels.PASSWORD));
 
         return user;
     }
 
     private static String getFieldValueFromRow(List<Object> row, List<String> labels, String label) {
         try {
-            return row
-                    .get(getIndexOfLabel(labels, label))
-                    .toString();
+            if (label.equals(Labels.ACCESS_CARD)) {
+                return row.get(getIndexOfLabel(labels, label)).toString().equalsIgnoreCase("da") ? "DA" : "NE";
+            } else {
+                return row.get(getIndexOfLabel(labels, label)).toString();
+            }
         } catch (IndexOutOfBoundsException e) {
             return "";
         }
     }
 
-    private static List<Boolean> getTrainingSessionsFromRow(List<Object> row, List<String> labels, String label) {
-        List<Boolean> sessions = new ArrayList<>(Collections.emptyList());
+    private static String getCommentsFromRow(List<Object> row) {
+        StringBuilder concatenatedString = new StringBuilder();
+        for (int i = 31; i <= 50; i++) {
+            if (i < row.size()) {
+                if(!row.get(i).toString().isEmpty()) {
+                    concatenatedString.append(row.get(i).toString());
+                    if (i < 50) {
+                        concatenatedString.append("++");
+                    }
+                }
+            }
+        }
+        return concatenatedString.toString();
+    }
+
+    private static String getTrainingSessionsFromRow(List<Object> row, List<String> labels, String label) {
+        List<String> sessions = new ArrayList<>(Collections.emptyList());
         IndexRange range = getIndexRangeOfLabel(labels, label);
 
         try {
             for (int i = range.getStartIndex(); i <= range.getEndIndex(); i++) {
-                sessions.add(Boolean.parseBoolean(row.get(i).toString()));
+                // Add training session only if the columns is filled
+                if(!labels.get(i).isEmpty()) {
+                    sessions.add(labels.get(i) + "+" + Boolean.parseBoolean(row.get(i).toString()));
+                }
             }
-            return sessions;
+
+            //.map(String::valueOf)
+            return String.join("_", sessions);
+//            return sessions;
         } catch (IndexOutOfBoundsException e) {
             System.out.println("T");
-            return sessions;
+            return "";
         }
     }
 
@@ -199,10 +225,7 @@ public class ExcelFileMapper {
 
     private static IndexRange getIndexRangeOfLabel(List<String> labels, String label) {
         // TODO: add login to get this range dynamically
-        return new IndexRange(7, 20);
+        return new IndexRange(8, 21);
     }
 
-    public static boolean hasExcelFormat(MultipartFile file) {
-        return FILE_TYPE.equals(file.getContentType());
-    }
 }

@@ -15,17 +15,23 @@ public class ExcelModelToModelMapper {
         user.setFirstName(excelUser.getFirstName());
         user.setLastName(excelUser.getLastName());
         user.setDate(excelUser.getDate());
+        user.setDateOfBirth(excelUser.getDateofBirth());
+        user.setDateDoctorReview(excelUser.getDateDoctorReview());
         user.setPaymentMethod(excelUser.getPaymentMethod());
         user.setMembershipFee(excelUser.getMembershipFee());
+        user.setPayments(excelUser.getPayments());
+        user.setComments(excelUser.getComments());
         user.setTrainingSessions(excelUser.getTrainingSessions());
+        user.setMembershipFees(excelUser.getMembershipFees());
         user.setTotalTrainingSessions(excelUser.getTotalTrainingSessions());
         user.setPhoneNumber(excelUser.getPhoneNumber());
         user.setInViberGroup(excelUser.getInViberGroup());
         user.setAccessCard(excelUser.getAccessCard());
         user.setHeight(excelUser.getHeight());
         user.setNote(excelUser.getNote());
-        user.setColorFlaggedInfo(excelUser.getColorFlaggedInfo());
-
+        user.setEmail(excelUser.getEmail());
+        user.setPassword(excelUser.getPassword());
+        user.setAgeGroup(excelUser.getAgeGroup());
         return user;
     }
 

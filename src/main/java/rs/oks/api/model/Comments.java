@@ -9,13 +9,13 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.sql.Timestamp;
 
 @Entity
-@Table(name = "training_sessions")
+@Table(name = "comments")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-public class TrainingSessions {
+public class Comments {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,8 +37,8 @@ public class TrainingSessions {
 
 
     // Info about training sessions
-    @Column(name = "training_sessions")
-    private String trainingSessions;
+    @Column(name = "comments")
+    private String comments;
 
     @Column(name = "month_year")
     private String monthYear;

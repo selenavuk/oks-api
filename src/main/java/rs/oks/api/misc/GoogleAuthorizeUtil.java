@@ -1,25 +1,94 @@
 package rs.oks.api.misc;
 
+import com.google.api.client.auth.oauth2.AuthorizationCodeFlow;
 import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.auth.oauth2.TokenResponse;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.client.util.store.MemoryDataStoreFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.sheets.v4.SheetsScopes;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Component;
 
 import java.awt.*;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.security.GeneralSecurityException;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-
+@Component
 public class GoogleAuthorizeUtil {
 
+    private static AuthorizationCodeFlow flow;
+
+    @PostConstruct
+    public void init() throws GeneralSecurityException, IOException {
+        Resource resource = new ClassPathResource("google-spreadsheets-client-secret.json");
+        InputStream in = resource.getInputStream();
+
+
+        GoogleClientSecrets clientSecrets = GoogleClientSecrets
+                .load(JacksonFactory.getDefaultInstance(), new InputStreamReader(in));
+
+        List<String> scopes = List.of(SheetsScopes.SPREADSHEETS);
+
+
+        flow = new GoogleAuthorizationCodeFlow
+                .Builder(
+                GoogleNetHttpTransport.newTrustedTransport(),
+                JacksonFactory.getDefaultInstance(),
+                clientSecrets,
+                scopes
+        )
+                .setDataStoreFactory(new MemoryDataStoreFactory())
+                .setAccessType("offline")
+                .build();
+    }
+
+    private String tokensDirectoryPath = "tokens";
+    private String clientSecretFile = "google-spreadsheets-client-secret.json";
+    private static String redirectUri = "http://localhost:8081/import/spreadsheets/callback";
+    private List<String> scopes = List.of(SheetsScopes.SPREADSHEETS);
+
+    public static String getAuthorizationUrl() throws IOException, GeneralSecurityException {
+//        Resource resource = new ClassPathResource("google-spreadsheets-client-secret.json");
+//        InputStream in = resource.getInputStream();
+//
+//
+//        GoogleClientSecrets clientSecrets = GoogleClientSecrets
+//                .load(JacksonFactory.getDefaultInstance(), new InputStreamReader(in));
+//
+//        List<String> scopes = List.of(SheetsScopes.SPREADSHEETS);
+//
+//
+//        flow = new GoogleAuthorizationCodeFlow
+//                .Builder(
+//                GoogleNetHttpTransport.newTrustedTransport(),
+//                JacksonFactory.getDefaultInstance(),
+//                clientSecrets,
+//                scopes
+//        )
+//                .setDataStoreFactory(new MemoryDataStoreFactory())
+//                .setAccessType("offline")
+//                .build();
+
+        return flow.newAuthorizationUrl().setRedirectUri(redirectUri).build();
+    }
+
+    public static Credential getCredentialFromCode(String code) throws IOException {
+        TokenResponse tokenResponse = flow.newTokenRequest(code).setRedirectUri(redirectUri).execute();
+        return flow.createAndStoreCredential(tokenResponse, "user");
+    }
     private static CompletableFuture<Credential> authorizationFuture;
 
     public static CompletableFuture<Credential> authorizeAsync() {

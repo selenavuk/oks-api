@@ -1,6 +1,5 @@
 package rs.oks.api.service;
 
-import org.springframework.data.repository.query.Param;
 import rs.oks.api.model.User;
 import rs.oks.api.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,9 +29,9 @@ public class UserService {
         }
     }
 
-    public User getUserByName(String firstName, String lastName) {
+    public User getUserByFullNameAndEmail(String firstName, String lastName, String email) {
         try {
-            Optional<User> userOptional = userRepository.findByName(firstName, lastName);
+            Optional<User> userOptional = userRepository.findByFullNameAndEmail(firstName, lastName, email);
             return userOptional.orElse(null);
         } catch (Exception e) {
             System.out.println(Arrays.toString(e.getStackTrace()));
@@ -40,9 +39,9 @@ public class UserService {
         }
     }
 
-    public List<User> getUserByUsername(String username) {
+    public List<User> getUserByEmail(String email) {
         try {
-            return userRepository.findByUsername(username);
+            return userRepository.findByEmail(email);
         } catch (Exception e) {
             System.out.println(Arrays.toString(e.getStackTrace()));
             return null;
@@ -55,19 +54,69 @@ public class UserService {
 
     public void updateUserWithExcelData(User user) {
         userRepository.updateUserWithExcelData(
-            user.getFirstName(),
+                user.getFirstName(),
                 user.getLastName(),
                 user.getDate(),
+                user.getDateDoctorReview(),
+                user.getDateOfBirth(),
                 user.getPaymentMethod(),
                 user.getMembershipFee(),
+                user.getTrainingSessions(),
                 user.getTotalTrainingSessions().toString(),
                 user.getPhoneNumber(),
                 user.getInViberGroup(),
                 user.getAccessCard(),
                 user.getHeight(),
                 user.getNote(),
-                user.getColorFlaggedInfo()
+                user.getAgeGroup(),
+                user.getEmail(),
+                user.getPassword()
         );
     }
 
+    public void updateUserLastLoginTime(User user) {
+        userRepository.updateUserLastLoginTime(
+                user.getLast_login(),
+                user.getEmail()
+        );
+    }
+
+    public void updateConfirmation(User user) {
+        userRepository.updateConfirmation(
+                user.getConfirmed(),
+                user.getEmail()
+        );
+    }
+
+    public void addDefaultAdminUser() {
+
+        String adminEmail = "okrodahotvolley@gmail.com";
+        String adminPass = "Okrodahotvolley123";
+
+        // Check if the default user already exists
+        Optional<User> existingUser = userRepository.findByEmail(adminEmail).stream().findAny();
+
+        if (existingUser.isPresent()) {
+            return;
+        }
+
+        User defaultUser = new User();
+        defaultUser.setAdministrator(true);
+        defaultUser.setFirstName("");
+        defaultUser.setLastName("");
+        defaultUser.setDate("");
+        defaultUser.setDateOfBirth("");
+        defaultUser.setPaymentMethod("");
+        defaultUser.setPhoneNumber("");
+        defaultUser.setInViberGroup("");
+        defaultUser.setAccessCard("");
+        defaultUser.setHeight("");
+        defaultUser.setNote("");
+        defaultUser.setAgeGroup("");
+        defaultUser.setEmail(adminEmail);
+        defaultUser.setPassword(adminPass);
+        defaultUser.setConfirmed(true);
+
+        userRepository.save(defaultUser);
+    }
 }

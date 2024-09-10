@@ -6,35 +6,36 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import rs.oks.api.model.TrainingSessions;
+import rs.oks.api.model.Comments;
+import rs.oks.api.model.Payments;
 
-import java.util.Optional;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
-public interface TrainingSessionsRepository extends JpaRepository<TrainingSessions,Integer> {
+public interface CommentsRepository extends JpaRepository<Comments,Integer> {
 
     @Transactional
     @Modifying
     @Query(
-            "UPDATE TrainingSessions ts " +
-            "SET ts.trainingSessions = :trainingSessions " +
-            "WHERE ts.firstName = :firstName AND ts.lastName = :lastName AND ts.email = :email AND ts.monthYear = :monthYear"
+            "UPDATE Comments c " +
+            "SET c.comments = :comments " +
+            "WHERE c.firstName = :firstName AND c.lastName = :lastName AND c.email = :email AND c.monthYear = :monthYear"
     )
-    void updateTrainingSessions(
+    void updateComments(
             @Param("firstName") String firstName,
             @Param("lastName") String lastName,
             @Param("email") String email,
             @Param("monthYear") String monthYear,
-            @Param("trainingSessions") String trainingSessions
+            @Param("comments") String comments
     );
 
     @Query(
-            "SELECT ts " +
-            "FROM TrainingSessions ts " +
-            "WHERE ts.firstName = :firstName AND ts.lastName = :lastName AND ts.email = :email AND ts.monthYear = :monthYear"
+            "SELECT c " +
+            "FROM Comments c " +
+            "WHERE c.firstName = :firstName AND c.lastName = :lastName AND c.email = :email AND c.monthYear = :monthYear"
     )
-    Optional<TrainingSessions> findByMonthFullNameAndEmail(
+    Optional<Comments> findByMonthFullNameAndEmail(
             @Param("firstName") String firstName,
             @Param("lastName") String lastName,
             @Param("email") String email,
@@ -42,11 +43,11 @@ public interface TrainingSessionsRepository extends JpaRepository<TrainingSessio
     );
 
     @Query(
-            "SELECT ts " +
-            "FROM TrainingSessions ts " +
-            "WHERE ts.firstName = :firstName AND ts.lastName = :lastName AND ts.email = :email"
+            "SELECT c " +
+            "FROM Comments c " +
+            "WHERE c.firstName = :firstName AND c.lastName = :lastName AND c.email = :email"
     )
-    List<TrainingSessions> findByFullNameAndEmail(
+    List<Comments> findByFullNameAndEmail(
             @Param("firstName") String firstName,
             @Param("lastName") String lastName,
             @Param("email") String email
