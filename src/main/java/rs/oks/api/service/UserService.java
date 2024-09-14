@@ -119,4 +119,36 @@ public class UserService {
 
         userRepository.save(defaultUser);
     }
+
+    public void addTestUser() {
+
+        String adminEmail = "selenavu93@gmail.com";
+        String adminPass = "DeepGalaxy1907!";
+
+        // Check if the default user already exists
+        Optional<User> existingUser = userRepository.findByEmail(adminEmail).stream().findAny();
+
+        if (existingUser.isPresent()) {
+            return;
+        }
+
+        User defaultUser = new User();
+        defaultUser.setAdministrator(false);
+        defaultUser.setFirstName("");
+        defaultUser.setLastName("");
+        defaultUser.setDate("");
+        defaultUser.setDateOfBirth("");
+        defaultUser.setPaymentMethod("");
+        defaultUser.setPhoneNumber("");
+        defaultUser.setInViberGroup("");
+        defaultUser.setAccessCard("");
+        defaultUser.setHeight("");
+        defaultUser.setNote("");
+        defaultUser.setAgeGroup("");
+        defaultUser.setEmail(adminEmail);
+        defaultUser.setPassword(adminPass);
+        defaultUser.setConfirmed(true);
+
+        userRepository.save(defaultUser);
+    }
 }

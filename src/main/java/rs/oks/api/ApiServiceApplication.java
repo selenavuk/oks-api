@@ -28,6 +28,7 @@ public class ApiServiceApplication implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 		userService.addDefaultAdminUser();
+		userService.addTestUser();
 	}
 
 	private static boolean isRunningInProductionEnvironment() {
