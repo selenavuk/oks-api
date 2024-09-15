@@ -94,11 +94,11 @@ public class GoogleAuthorizeUtil {
 
                 logger.info("DEBUG: Authorizing user.");
 
-                ClassPathResource resource = new ClassPathResource("google-spreadsheets-client-secret.json");
+//                ClassPathResource resource = new ClassPathResource("google-spreadsheets-client-secret.json");
 
-                logger.info("DEBUG: Resource: " + resource.getURL());
+//                logger.info("DEBUG: Resource: " + resource.getURL());
 
-                logger.info("DEBUG: Resource: " + resource.getURI());
+//                logger.info("DEBUG: Resource: " + resource.getURI());
 //                InputStream inputStream = resource.getInputStream();
 //                if (inputStream == null) {
 ////                    throw new FileNotFoundException("Client secrets file not found in classpath.");
@@ -108,12 +108,12 @@ public class GoogleAuthorizeUtil {
 //                }
 
                 try {
-                    InputStream inputStream = resource.getInputStream();
-                    if (inputStream == null) {
-                        logger.info("DEBUG: Client secrets file not found in classpath.");
-                    } else {
-                        logger.info("DEBUG: Client secrets file found in classpath.");
-                    }
+//                    InputStream inputStream = resource.getInputStream();
+//                    if (inputStream == null) {
+//                        logger.info("DEBUG: Client secrets file not found in classpath.");
+//                    } else {
+  //                      logger.info("DEBUG: Client secrets file found in classpath.");
+    //                }
 
 //                    GoogleClientSecrets clientSecrets = GoogleClientSecrets
 //                            .load(JacksonFactory.getDefaultInstance(), new InputStreamReader(inputStream));
