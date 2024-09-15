@@ -97,6 +97,7 @@ public class GoogleAuthorizeUtil {
 
                 logger.info("DEBUG: Resource: " + resource.getURL());
 
+                logger.info("DEBUG: Resource: " + resource.getURI());
 //                InputStream inputStream = resource.getInputStream();
 //                if (inputStream == null) {
 ////                    throw new FileNotFoundException("Client secrets file not found in classpath.");
