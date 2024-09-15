@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
+import rs.oks.api.controller.ImportController;
 
 import java.awt.*;
 import java.io.IOException;
@@ -26,10 +27,14 @@ import java.net.URI;
 import java.security.GeneralSecurityException;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.logging.Logger;
+
 @Component
 public class GoogleAuthorizeUtil {
 
     private static AuthorizationCodeFlow flow;
+
+    private static final Logger logger = Logger.getLogger(ImportController.class.getName());
 
     @PostConstruct
     public void init() throws GeneralSecurityException, IOException {
@@ -59,9 +64,9 @@ public class GoogleAuthorizeUtil {
     private String clientSecretFile = "google-spreadsheets-client-secret.json";
 
 //    local
-//    private static String redirectUri = "http://localhost:8081/import/spreadsheets/callback";
+    private static String redirectUri = "http://localhost:8081/import/spreadsheets/callback";
 //  production
-    private static String redirectUri = "https://oks-api-production.up.railway.app/import/spreadsheets/callback";
+//    private static String redirectUri = "https://oks-api-production.up.railway.app/import/spreadsheets/callback";
 
     private List<String> scopes = List.of(SheetsScopes.SPREADSHEETS);
 
@@ -78,19 +83,26 @@ public class GoogleAuthorizeUtil {
     public static CompletableFuture<Credential> authorizeAsync() {
 
         if(authorizationFuture != null) {
+            logger.info("DEBUG: Returning existing authorization future." + authorizationFuture);
             return authorizationFuture;
         }
 
         authorizationFuture = CompletableFuture.supplyAsync(() -> {
             try {
 
+                logger.info("DEBUG: Authorizing user.");
                 ClassPathResource resource = new ClassPathResource("google-spreadsheets-client-secret.json");
+
+                logger.info("DEBUG: Resource: " + resource);
                 InputStream inputStream = resource.getInputStream();
 
                 GoogleClientSecrets clientSecrets = GoogleClientSecrets
                         .load(JacksonFactory.getDefaultInstance(), new InputStreamReader(inputStream));
 
+                logger.info("DEBUG: Client secrets: " + clientSecrets);
                 List<String> scopes = List.of(SheetsScopes.SPREADSHEETS);
+
+                logger.info("DEBUG: Scopes: " + scopes);
 
                 GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow
                         .Builder(
@@ -103,7 +115,11 @@ public class GoogleAuthorizeUtil {
                         .setAccessType("offline")
                         .build();
 
+                logger.info("DEBUG: Flow: " + flow);
+
                 LocalServerReceiver localServerReceiver = new LocalServerReceiver.Builder().setPort(59401).build();
+
+                logger.info("DEBUG: Local server receiver: " + localServerReceiver);
                 AuthorizationCodeInstalledApp authorizationCodeInstalledApp = new AuthorizationCodeInstalledApp(flow, localServerReceiver);
                 Credential credential = authorizationCodeInstalledApp.authorize("user");
 

@@ -11,6 +11,7 @@ import com.google.api.client.util.store.MemoryDataStoreFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
 import org.springframework.core.io.ClassPathResource;
+import rs.oks.api.controller.ImportController;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,10 +22,14 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
+import java.util.logging.Logger;
+
 public class GoogleSheetsServiceUtil {
     private static final String APPLICATION_NAME = "oks-rest-api";
+    private static final Logger logger = Logger.getLogger(ImportController.class.getName());
 
     public static Sheets getSheets() throws IOException, GeneralSecurityException, ExecutionException, InterruptedException {
+        logger.info("DEBUG: Getting Google Sheets service.");
         CompletableFuture<Credential> credential = GoogleAuthorizeUtil.authorizeAsync();
         return new Sheets
                 .Builder(
