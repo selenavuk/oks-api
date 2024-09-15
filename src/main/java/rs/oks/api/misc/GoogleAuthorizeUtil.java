@@ -57,31 +57,15 @@ public class GoogleAuthorizeUtil {
 
     private String tokensDirectoryPath = "tokens";
     private String clientSecretFile = "google-spreadsheets-client-secret.json";
-    private static String redirectUri = "http://localhost:8081/import/spreadsheets/callback";
+
+//    local
+//    private static String redirectUri = "http://localhost:8081/import/spreadsheets/callback";
+//  production
+    private static String redirectUri = "https://oks-api-production.up.railway.app/import/spreadsheets/callback";
+
     private List<String> scopes = List.of(SheetsScopes.SPREADSHEETS);
 
     public static String getAuthorizationUrl() throws IOException, GeneralSecurityException {
-//        Resource resource = new ClassPathResource("google-spreadsheets-client-secret.json");
-//        InputStream in = resource.getInputStream();
-//
-//
-//        GoogleClientSecrets clientSecrets = GoogleClientSecrets
-//                .load(JacksonFactory.getDefaultInstance(), new InputStreamReader(in));
-//
-//        List<String> scopes = List.of(SheetsScopes.SPREADSHEETS);
-//
-//
-//        flow = new GoogleAuthorizationCodeFlow
-//                .Builder(
-//                GoogleNetHttpTransport.newTrustedTransport(),
-//                JacksonFactory.getDefaultInstance(),
-//                clientSecrets,
-//                scopes
-//        )
-//                .setDataStoreFactory(new MemoryDataStoreFactory())
-//                .setAccessType("offline")
-//                .build();
-
         return flow.newAuthorizationUrl().setRedirectUri(redirectUri).build();
     }
 
