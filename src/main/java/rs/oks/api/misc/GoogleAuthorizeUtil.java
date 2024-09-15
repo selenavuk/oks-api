@@ -96,48 +96,93 @@ public class GoogleAuthorizeUtil {
 
                 logger.info("DEBUG: Resource: " + resource.getURL());
 
-                InputStream inputStream = resource.getInputStream();
-                if (inputStream == null) {
-//                    throw new FileNotFoundException("Client secrets file not found in classpath.");
-                    logger.info("DEBUG: Client secrets file not found in classpath.");
-                } else {
-                    logger.info("DEBUG: Client secrets file found in classpath.");
-                }
+//                InputStream inputStream = resource.getInputStream();
+//                if (inputStream == null) {
+////                    throw new FileNotFoundException("Client secrets file not found in classpath.");
+//                    logger.info("DEBUG: Client secrets file not found in classpath.");
+//                } else {
+//                    logger.info("DEBUG: Client secrets file found in classpath.");
+//                }
 
-                GoogleClientSecrets clientSecrets = GoogleClientSecrets
-                        .load(JacksonFactory.getDefaultInstance(), new InputStreamReader(inputStream));
+                try {
+                    InputStream inputStream = resource.getInputStream();
+                    if (inputStream == null) {
+                        logger.info("DEBUG: Client secrets file not found in classpath.");
+                    } else {
+                        logger.info("DEBUG: Client secrets file found in classpath.");
+                    }
 
-                logger.info("DEBUG: Client secrets: " + clientSecrets);
-                List<String> scopes = List.of(SheetsScopes.SPREADSHEETS);
+                    GoogleClientSecrets clientSecrets = GoogleClientSecrets
+                            .load(JacksonFactory.getDefaultInstance(), new InputStreamReader(inputStream));
 
-                logger.info("DEBUG: Scopes: " + scopes);
 
-                GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow
-                        .Builder(
+
+                    logger.info("DEBUG: Client secrets: " + clientSecrets);
+                    List<String> scopes = List.of(SheetsScopes.SPREADSHEETS);
+
+                    logger.info("DEBUG: Scopes: " + scopes);
+
+                    GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow
+                            .Builder(
                             GoogleNetHttpTransport.newTrustedTransport(),
                             JacksonFactory.getDefaultInstance(),
                             clientSecrets,
                             scopes
-                        )
-                        .setDataStoreFactory(new MemoryDataStoreFactory())
-                        .setAccessType("offline")
-                        .build();
+                    )
+                            .setDataStoreFactory(new MemoryDataStoreFactory())
+                            .setAccessType("offline")
+                            .build();
 
-                logger.info("DEBUG: Flow: " + flow);
+                    logger.info("DEBUG: Flow: " + flow);
 
-                LocalServerReceiver localServerReceiver = new LocalServerReceiver.Builder().setPort(59401).build();
+                    LocalServerReceiver localServerReceiver = new LocalServerReceiver.Builder().setPort(59401).build();
 
-                logger.info("DEBUG: Local server receiver: " + localServerReceiver);
-                AuthorizationCodeInstalledApp authorizationCodeInstalledApp = new AuthorizationCodeInstalledApp(flow, localServerReceiver);
-                Credential credential = authorizationCodeInstalledApp.authorize("user");
+                    logger.info("DEBUG: Local server receiver: " + localServerReceiver);
+                    AuthorizationCodeInstalledApp authorizationCodeInstalledApp = new AuthorizationCodeInstalledApp(flow, localServerReceiver);
+                    Credential credential = authorizationCodeInstalledApp.authorize("user");
+                    return credential;
+
+
+                } catch (IOException e) {
+                    logger.info("Error accessing client secrets file: " + e);
+                }
+
+//                GoogleClientSecrets clientSecrets = GoogleClientSecrets
+//                        .load(JacksonFactory.getDefaultInstance(), new InputStreamReader(inputStream));
+
+//                logger.info("DEBUG: Client secrets: " + clientSecrets);
+//                List<String> scopes = List.of(SheetsScopes.SPREADSHEETS);
+//
+//                logger.info("DEBUG: Scopes: " + scopes);
+//
+//                GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow
+//                        .Builder(
+//                            GoogleNetHttpTransport.newTrustedTransport(),
+//                            JacksonFactory.getDefaultInstance(),
+//                            clientSecrets,
+//                            scopes
+//                        )
+//                        .setDataStoreFactory(new MemoryDataStoreFactory())
+//                        .setAccessType("offline")
+//                        .build();
+//
+//                logger.info("DEBUG: Flow: " + flow);
+//
+//                LocalServerReceiver localServerReceiver = new LocalServerReceiver.Builder().setPort(59401).build();
+//
+//                logger.info("DEBUG: Local server receiver: " + localServerReceiver);
+//                AuthorizationCodeInstalledApp authorizationCodeInstalledApp = new AuthorizationCodeInstalledApp(flow, localServerReceiver);
+//                Credential credential = authorizationCodeInstalledApp.authorize("user");
 
 //                URI authorizationUri = new URI(localServerReceiver.getRedirectUri());
 //                Desktop.getDesktop().browse(authorizationUri);
 
-                return credential;
+//                return credential;
             } catch (Exception e) {
                 throw new RuntimeException("Failed to authorize", e);
             }
+
+            return null;
         });
 
         return authorizationFuture;
