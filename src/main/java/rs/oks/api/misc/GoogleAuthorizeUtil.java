@@ -92,6 +92,7 @@ public class GoogleAuthorizeUtil {
             try {
 
                 logger.info("DEBUG: Authorizing user.");
+
                 ClassPathResource resource = new ClassPathResource("google-spreadsheets-client-secret.json");
 
                 logger.info("DEBUG: Resource: " + resource.getURL());

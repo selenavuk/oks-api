@@ -29,7 +29,6 @@ public class GoogleSheetsServiceUtil {
     private static final Logger logger = Logger.getLogger(ImportController.class.getName());
 
     public static Sheets getSheets() throws IOException, GeneralSecurityException, ExecutionException, InterruptedException {
-        logger.info("DEBUG: Getting Google Sheets service.");
         CompletableFuture<Credential> credential = GoogleAuthorizeUtil.authorizeAsync();
         return new Sheets
                 .Builder(
