@@ -18,6 +18,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import rs.oks.api.controller.ImportController;
+import rs.oks.api.misc.classes.GoogleClientSecretsConfig;
 
 import java.awt.*;
 import java.io.FileNotFoundException;
@@ -114,8 +115,10 @@ public class GoogleAuthorizeUtil {
                         logger.info("DEBUG: Client secrets file found in classpath.");
                     }
 
-                    GoogleClientSecrets clientSecrets = GoogleClientSecrets
-                            .load(JacksonFactory.getDefaultInstance(), new InputStreamReader(inputStream));
+//                    GoogleClientSecrets clientSecrets = GoogleClientSecrets
+//                            .load(JacksonFactory.getDefaultInstance(), new InputStreamReader(inputStream));
+
+                    GoogleClientSecrets clientSecrets = GoogleClientSecretsConfig.getClientSecrets();
 
 
 
