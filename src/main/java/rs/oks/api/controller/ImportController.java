@@ -8,11 +8,13 @@ import rs.oks.api.service.ImportService;
 import com.google.api.client.auth.oauth2.Credential;
 import rs.oks.api.misc.GoogleAuthorizeUtil;
 
-import java.io.Console;
+import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("/import")
 public class ImportController {
+
+    private static final Logger logger = Logger.getLogger(ImportController.class.getName());
 
     @Autowired
     private ImportService importService;
@@ -30,12 +32,11 @@ public class ImportController {
 
     @GetMapping("/spreadsheets/callback")
     public ResponseEntity<String> handleGoogleCallback(@RequestParam("code") String code) {
+        logger.info("DEBUG: Handling Google callback with code: " + code);
 
-        Console console = System.console();
-        console.writer().println("DEBUG: Code: " + code);
         try {
             Credential credential = GoogleAuthorizeUtil.getCredentialFromCode(code);
-            console.writer().println("DEBUG: Credential: " + credential);
+            logger.info("DEBUG: Credential successfully obtained from code.");
             importService.updateDatabaseFromSpreadSheetsFile(credential);
             String responseMessage = "Data successfully imported from Google Spread Sheets. <a href=\"http://localhost:4200/\">Click here to go back.</a>";
             return ResponseEntity.ok(responseMessage);
