@@ -65,9 +65,9 @@ public class GoogleAuthorizeUtil {
     private String clientSecretFile = "google-spreadsheets-client-secret.json";
 
 //    local
-    private static String redirectUri = "http://localhost:8081/import/spreadsheets/callback";
+//    private static String redirectUri = "http://localhost:8081/import/spreadsheets/callback";
 //  production
-//    private static String redirectUri = "https://oks-api-production.up.railway.app/import/spreadsheets/callback";
+    private static String redirectUri = "https://oks-api-production.up.railway.app/import/spreadsheets/callback";
 
     private List<String> scopes = List.of(SheetsScopes.SPREADSHEETS);
 
