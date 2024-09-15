@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 import rs.oks.api.controller.ImportController;
 
 import java.awt.*;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -64,9 +65,9 @@ public class GoogleAuthorizeUtil {
     private String clientSecretFile = "google-spreadsheets-client-secret.json";
 
 //    local
-//    private static String redirectUri = "http://localhost:8081/import/spreadsheets/callback";
+    private static String redirectUri = "http://localhost:8081/import/spreadsheets/callback";
 //  production
-    private static String redirectUri = "https://oks-api-production.up.railway.app/import/spreadsheets/callback";
+//    private static String redirectUri = "https://oks-api-production.up.railway.app/import/spreadsheets/callback";
 
     private List<String> scopes = List.of(SheetsScopes.SPREADSHEETS);
 
@@ -93,9 +94,12 @@ public class GoogleAuthorizeUtil {
                 logger.info("DEBUG: Authorizing user.");
                 ClassPathResource resource = new ClassPathResource("google-spreadsheets-client-secret.json");
 
-                logger.info("DEBUG: Resource: " + resource);
-                InputStream inputStream = resource.getInputStream();
+                logger.info("DEBUG: Resource: " + resource.getPath());
 
+                InputStream inputStream = resource.getInputStream();
+                if (inputStream == null) {
+                    throw new FileNotFoundException("Client secrets file not found in classpath.");
+                }
                 GoogleClientSecrets clientSecrets = GoogleClientSecrets
                         .load(JacksonFactory.getDefaultInstance(), new InputStreamReader(inputStream));
 
