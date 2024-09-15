@@ -8,6 +8,8 @@ import rs.oks.api.service.ImportService;
 import com.google.api.client.auth.oauth2.Credential;
 import rs.oks.api.misc.GoogleAuthorizeUtil;
 
+import java.io.Console;
+
 @RestController
 @RequestMapping("/import")
 public class ImportController {
@@ -28,8 +30,12 @@ public class ImportController {
 
     @GetMapping("/spreadsheets/callback")
     public ResponseEntity<String> handleGoogleCallback(@RequestParam("code") String code) {
+
+        Console console = System.console();
+        console.writer().println("DEBUG: Code: " + code);
         try {
             Credential credential = GoogleAuthorizeUtil.getCredentialFromCode(code);
+            console.writer().println("DEBUG: Credential: " + credential);
             importService.updateDatabaseFromSpreadSheetsFile(credential);
             String responseMessage = "Data successfully imported from Google Spread Sheets. <a href=\"http://localhost:4200/\">Click here to go back.</a>";
             return ResponseEntity.ok(responseMessage);
