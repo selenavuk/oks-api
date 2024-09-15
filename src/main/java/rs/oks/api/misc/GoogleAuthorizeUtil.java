@@ -143,7 +143,16 @@ public class GoogleAuthorizeUtil {
                     LocalServerReceiver localServerReceiver = new LocalServerReceiver.Builder().setPort(59401).build();
 
                     logger.info("DEBUG: Local server receiver: " + localServerReceiver);
-                    AuthorizationCodeInstalledApp authorizationCodeInstalledApp = new AuthorizationCodeInstalledApp(flow, localServerReceiver);
+//                    AuthorizationCodeInstalledApp authorizationCodeInstalledApp = new AuthorizationCodeInstalledApp(flow, localServerReceiver);
+
+                    AuthorizationCodeInstalledApp authorizationCodeInstalledApp = new AuthorizationCodeInstalledApp(flow, localServerReceiver) {
+//                        @Override
+                        protected void onAuthorization(AuthorizationCodeFlow flow, Credential credential) {
+                            // Custom handling after authorization
+                            logger.info("DEBUG: Authorization completed.");
+                        }
+                    };
+
                     Credential credential = authorizationCodeInstalledApp.authorize("user");
                     return credential;
 
