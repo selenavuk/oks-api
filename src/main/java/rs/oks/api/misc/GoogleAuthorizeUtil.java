@@ -29,6 +29,7 @@ import java.net.URI;
 import java.security.GeneralSecurityException;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
 
 @Component
@@ -37,6 +38,7 @@ public class GoogleAuthorizeUtil {
     private static AuthorizationCodeFlow flow;
 
     private static final Logger logger = Logger.getLogger(ImportController.class.getName());
+    private static CompletableFuture<String> authorizationCodeFuture = new CompletableFuture<>();
 
     @PostConstruct
     public void init() throws GeneralSecurityException, IOException {
@@ -140,20 +142,27 @@ public class GoogleAuthorizeUtil {
 
                     logger.info("DEBUG: Flow: " + flow);
 
-                    LocalServerReceiver localServerReceiver = new LocalServerReceiver.Builder().setPort(59401).build();
+                    String authorizationUrl = flow.newAuthorizationUrl().setRedirectUri(redirectUri).build();
+                    logger.info("Please open the following address in your browser: " + authorizationUrl);
 
-                    logger.info("DEBUG: Local server receiver: " + localServerReceiver);
+
+//                    LocalServerReceiver localServerReceiver = new LocalServerReceiver.Builder().setPort(59401).build();
+
+//                    logger.info("DEBUG: Local server receiver: " + localServerReceiver);
 //                    AuthorizationCodeInstalledApp authorizationCodeInstalledApp = new AuthorizationCodeInstalledApp(flow, localServerReceiver);
+                    String code = waitForAuthorizationCode(); // Implement this method to get the code from the user
+                    TokenResponse tokenResponse = flow.newTokenRequest(code).setRedirectUri(redirectUri).execute();
+                    Credential credential = flow.createAndStoreCredential(tokenResponse, "user");
 
-                    AuthorizationCodeInstalledApp authorizationCodeInstalledApp = new AuthorizationCodeInstalledApp(flow, localServerReceiver) {
+//                    AuthorizationCodeInstalledApp authorizationCodeInstalledApp = new AuthorizationCodeInstalledApp(flow, localServerReceiver) {
 //                        @Override
-                        protected void onAuthorization(AuthorizationCodeFlow flow, Credential credential) {
-                            // Custom handling after authorization
-                            logger.info("DEBUG: Authorization completed.");
-                        }
-                    };
+//                        protected void onAuthorization(AuthorizationCodeFlow flow, Credential credential) {
+//                             Custom handling after authorization
+//                            logger.info("DEBUG: Authorization completed.");
+//                        }
+//                    };
 
-                    Credential credential = authorizationCodeInstalledApp.authorize("user");
+//                    Credential credential = authorizationCodeInstalledApp.authorize("user");
                     return credential;
 
 
@@ -201,5 +210,15 @@ public class GoogleAuthorizeUtil {
 
         return authorizationFuture;
     }
+    private static String waitForAuthorizationCode() {
+        try {
+            return authorizationCodeFuture.get();
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException("Failed to get authorization code", e);
+        }
+    }
 
+    public static void setAuthorizationCode(String code) {
+        authorizationCodeFuture.complete(code);
+    }
 }
