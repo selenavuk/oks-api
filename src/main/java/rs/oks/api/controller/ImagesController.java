@@ -26,7 +26,7 @@ public class ImagesController {
         List<String> imageLinks = new ArrayList<>();
         try {
             String baseUrl = "https://drive.google.com/uc?export=view&id=";
-            String folderId = "1OK36QYvREEJbw6CNUw5BrnXdg_gEMqLA";
+            String folderId = "1x4rFGHCD4ZFt1aSXhazJqna0KStDR2Gg";
 
             String result = googleDriveService.listFiles(folderId);
 
@@ -53,7 +53,7 @@ public class ImagesController {
         List<String> imageLinks = new ArrayList<>();
         try {
             String baseUrl = "https://drive.google.com/uc?export=view&id=";
-            String folderId = "1OK36QYvREEJbw6CNUw5BrnXdg_gEMqLA";
+            String folderId = "1wIgv8IQTenZB7rxLV5WPGJ0J2iTFKl0y";
 
             String result = googleDriveService.listFiles(folderId);
 
