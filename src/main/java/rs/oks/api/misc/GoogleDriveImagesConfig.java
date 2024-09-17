@@ -29,7 +29,11 @@ public class GoogleDriveImagesConfig {
         // Gallery Images Folder ID: 1OK36QYvREEJbw6CNUw5BrnXdg_gEMqLA
 
         public String listFiles(String folderId) throws IOException {
+/*
             String apiKey = "AIzaSyCk2ge7dZF27Tov8keREif8zfRqoozJXqk";
+*/
+            String apiKey = "AIzaSyCtDJKhCdkDl2UIL6f5ox05fEzYCLU6-rA";
+
             String query = URLEncoder.encode("'" + folderId + "' in parents and mimeType contains 'image/'", StandardCharsets.UTF_8);
             String url = "https://www.googleapis.com/drive/v3/files?q=" + query + "&fields=files(id,name,webViewLink)&key=" + apiKey;
             HttpGet request = new HttpGet(url);

@@ -32,7 +32,9 @@ public class ExcelFileMapper {
 //    private static final String FILE_TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 //    private static final List<String> groupsToImport = Arrays.asList("mladja1", "mladja2", "srednja", "starija");
 
-    public static final String FILE_ID = "1QdpovMV4e-b3HYCFLCdDJC_jb3bbQQaQ-AeYa6aGXBQ";
+//    public static final String FILE_ID = "1QdpovMV4e-b3HYCFLCdDJC_jb3bbQQaQ-AeYa6aGXBQ";
+
+    public static final String FILE_ID = "1GOtntCvuntlmqAFMmkPDA3PsmQJt8nXJaiC2Ows_bvE";
 
     public static GoogleSpreadSheetsReadingResult readContentFromGoogleSpreadSheets(Credential credential) throws GeneralSecurityException, IOException, ExecutionException, InterruptedException {
 
