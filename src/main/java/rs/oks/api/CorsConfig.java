@@ -14,7 +14,7 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:4200", "https://www.rhv.rs", "http://www.rhv.rs", "https://oks-api-production.up.railway.app", "https://accounts.google.com", "https://oks-api-production.up.railway.app/login")
+                        .allowedOrigins("https://www.rhv.rs", "https://oks-api-production.up.railway.app", "https://accounts.google.com")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("Content-Type", "Authorization")
                         .allowCredentials(true);
