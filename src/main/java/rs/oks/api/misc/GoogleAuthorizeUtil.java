@@ -96,8 +96,8 @@ private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstanc
         authorizationFuture = CompletableFuture.supplyAsync(() -> {
             try {
                 try {
-//                    GoogleClientSecrets clientSecrets = GoogleClientSecretsConfig.getClientSecrets();
-                    GoogleClientSecrets clientSecrets = getClientSecrets();
+                    GoogleClientSecrets clientSecrets = GoogleClientSecretsConfig.getClientSecrets();
+//                    GoogleClientSecrets clientSecrets = getClientSecrets();
                     List<String> scopes = List.of(SheetsScopes.SPREADSHEETS);
 
                     GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow
