@@ -11,7 +11,7 @@ public class GoogleClientSecretsConfig {
     private static final String CLIENT_SECRETS_JSON_TEMPLATE = "{\n" +
             "  \"web\": {\n" +
             "    \"client_id\": \"72055840890-brmi6c7jn2fnj8830cqek5gjp4aomlj6.apps.googleusercontent.com\",\n" +
-            "    \"project_id\": \"oks-rest-api\",\n" +
+            "    \"project_id\": \"oks-rest-api-435116\",\n" +
             "    \"auth_uri\": \"https://accounts.google.com/o/oauth2/auth\",\n" +
             "    \"token_uri\": \"https://oauth2.googleapis.com/token\",\n" +
             "    \"auth_provider_x509_cert_url\": \"https://www.googleapis.com/oauth2/v1/certs\",\n" +
