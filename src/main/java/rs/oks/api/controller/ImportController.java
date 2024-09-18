@@ -42,7 +42,9 @@ public class ImportController {
             importService.updateDatabaseFromSpreadSheetsFile(credential);
             logger.info("DEBUG: Data successfully imported from Google Spread Sheets.");
 //            String responseMessage = "Data successfully imported from Google Spread Sheets. <a href=\"http://localhost:4200/\">Click here to go back.</a>";
-            String responseMessage = "Data successfully imported from Google Spread Sheets. <a href=\"https://rhv.rs/\">Click here to go back.</a>";
+//            String responseMessage = "Data successfully imported from Google Spread Sheets. <a href=\"https://rhv.rs/\">Click here to go back.</a>";
+            String responseMessage = "Data successfully imported from Google Spread Sheets.";
+
             return ResponseEntity.ok(responseMessage);
         } catch (Exception e) {
             String errorMessage = "Error importing users from Google Spread Sheets: " + e.getMessage();
