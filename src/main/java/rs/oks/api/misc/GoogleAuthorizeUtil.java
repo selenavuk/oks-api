@@ -6,6 +6,7 @@ import com.google.api.client.auth.oauth2.TokenResponse;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.json.JsonFactory;
 import com.google.api.client.util.store.MemoryDataStoreFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.sheets.v4.SheetsScopes;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
+import java.io.FileReader;
 
 @Component
 public class GoogleAuthorizeUtil {
@@ -64,11 +66,18 @@ public class GoogleAuthorizeUtil {
 //    private static String redirectUri = "http://localhost:8081/import/spreadsheets/callback";
 //  production
     private static String redirectUri = "https://oks-api-production.up.railway.app/import/spreadsheets/callback";
+private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
 
     private List<String> scopes = List.of(SheetsScopes.SPREADSHEETS);
 
     public static String getAuthorizationUrl() throws IOException, GeneralSecurityException {
         return flow.newAuthorizationUrl().setRedirectUri(redirectUri).build();
+    }
+
+    public static GoogleClientSecrets getClientSecrets() throws IOException {
+        try (FileReader reader = new FileReader("google-spreadsheets-client-secret.json")) {
+            return GoogleClientSecrets.load(JSON_FACTORY, reader);
+        }
     }
 
     public static Credential getCredentialFromCode(String code) throws IOException {
@@ -87,7 +96,8 @@ public class GoogleAuthorizeUtil {
         authorizationFuture = CompletableFuture.supplyAsync(() -> {
             try {
                 try {
-                    GoogleClientSecrets clientSecrets = GoogleClientSecretsConfig.getClientSecrets();
+//                    GoogleClientSecrets clientSecrets = GoogleClientSecretsConfig.getClientSecrets();
+                    GoogleClientSecrets clientSecrets = getClientSecrets();
                     List<String> scopes = List.of(SheetsScopes.SPREADSHEETS);
 
                     GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow
