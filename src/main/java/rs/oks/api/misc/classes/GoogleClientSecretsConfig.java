@@ -20,8 +20,8 @@ public class GoogleClientSecretsConfig {
             "}";
 
     public static GoogleClientSecrets getClientSecrets() throws IOException {
-        String clientSecret = System.getenv("GOOGLE_CLIENT_SECRET");
-        String clientSecretsJson = String.format(CLIENT_SECRETS_JSON_TEMPLATE, clientSecret);
+        String vv = "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";
+        String clientSecretsJson = String.format(CLIENT_SECRETS_JSON_TEMPLATE, vv);
         return GoogleClientSecrets.load(JacksonFactory.getDefaultInstance(), new StringReader(clientSecretsJson));
     }
 }
