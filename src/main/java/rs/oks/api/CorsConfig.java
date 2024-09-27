@@ -16,7 +16,8 @@ public class CorsConfig {
                 registry.addMapping("/**")
                         .allowedOrigins("https://www.rhv.rs", "https://oks-api-production.up.railway.app", "https://accounts.google.com")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                        .allowedHeaders("Content-Type", "Authorization")
+//                        .allowedHeaders("Content-Type", "Authorization")
+                        .allowedHeaders("*")
                         .allowCredentials(true);
             }
         };
