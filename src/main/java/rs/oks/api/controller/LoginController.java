@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 //import rs.oks.api.misc.JwtUtil;
 import rs.oks.api.controller.util.LoginRequest;
@@ -37,7 +38,7 @@ public class LoginController {
 //    private PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<String> login(@RequestParam String username, @RequestParam String password) {
 //        Authentication authentication = authenticationManager.authenticate(
 //                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
@@ -47,10 +48,10 @@ public class LoginController {
 //        String token = jwtUtil.generateToken(userDetails.getUsername());
 
         // TODO: find out some better way to handle this logic
-        List<User> users = userService.getUserByEmail(loginRequest.getUsername());
+        List<User> users = userService.getUserByEmail(username);
 
         User firstUserUsedToCheckCredentials = users.stream().findFirst().orElse(null);
-        if (firstUserUsedToCheckCredentials != null && firstUserUsedToCheckCredentials.getPassword().equals(loginRequest.getPassword())) {
+        if (firstUserUsedToCheckCredentials != null && firstUserUsedToCheckCredentials.getPassword().equals(password)) {
 
             // TODO: token will be usefull when security is added
 //            String token = jwtUtil.generateToken(firstUserUsedToCheckCredentials.getEmail());
