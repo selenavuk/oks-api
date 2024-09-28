@@ -36,6 +36,7 @@ public class SecurityConfig {
 //                        .requestMatchers("/login").permitAll()
 //                        .anyRequest().authenticated()
                                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                                .requestMatchers("/login").permitAll()
                                 .anyRequest().permitAll()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
