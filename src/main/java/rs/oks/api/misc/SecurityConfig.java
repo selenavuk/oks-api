@@ -51,20 +51,30 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
 
-        config.addAllowedOrigin("https://localhost:4200");
-        config.addAllowedOrigin("https://www.rhv.rs");
-        config.addAllowedOrigin("https://oks-api-production.up.railway.app");
-        config.addAllowedOrigin("https://accounts.google.com");
+//        config.addAllowedOrigin("https://localhost:4200");
+//        config.addAllowedOrigin("https://www.rhv.rs");
+//        config.addAllowedOrigin("https://oks-api-production.up.railway.app");
+//        config.addAllowedOrigin("https://accounts.google.com");
 
 //        .allowedHeaders("Content-Type", "Authorization")
-        config.addAllowedHeader("Content-Type");
-        config.addAllowedHeader("Authorization");
+//        config.addAllowedHeader("Content-Type");
+//        config.addAllowedHeader("Authorization");
 
-        config.addAllowedMethod("OPTIONS");
-        config.addAllowedMethod("GET");
-        config.addAllowedMethod("POST");
-        config.addAllowedMethod("PUT");
-        config.addAllowedMethod("DELETE");
+//        config.addAllowedMethod("OPTIONS");
+//        config.addAllowedMethod("GET");
+//        config.addAllowedMethod("POST");
+//        config.addAllowedMethod("PUT");
+//        config.addAllowedMethod("DELETE");
+
+
+        // Allow all origins
+        config.addAllowedOriginPattern("*");
+
+        // Allow all headers
+        config.addAllowedHeader("*");
+
+        // Allow all methods
+        config.addAllowedMethod("*");
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
