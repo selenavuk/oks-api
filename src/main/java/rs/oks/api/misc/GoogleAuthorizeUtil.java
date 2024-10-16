@@ -82,7 +82,8 @@ private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstanc
 
     public static Credential getCredentialFromCode(String code) throws IOException {
         TokenResponse tokenResponse = flow.newTokenRequest(code).setRedirectUri(redirectUri).execute();
-        return flow.createAndStoreCredential(tokenResponse, "user");
+        Credential credential = flow.createAndStoreCredential(tokenResponse, "user");
+        return refreshAccessToken(credential);
     }
     private static CompletableFuture<Credential> authorizationFuture;
 
@@ -138,6 +139,13 @@ private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstanc
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException("Failed to get authorization code", e);
         }
+    }
+
+    public static Credential refreshAccessToken(Credential credential) throws IOException {
+        if (credential.getExpiresInSeconds() != null && credential.getExpiresInSeconds() <= 60) {
+            credential.refreshToken();
+        }
+        return credential;
     }
 
     public static void setAuthorizationCode(String code) {

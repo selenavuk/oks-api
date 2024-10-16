@@ -37,8 +37,9 @@ public class ImportController {
         try {
             Credential credential = GoogleAuthorizeUtil.getCredentialFromCode(code);
             GoogleAuthorizeUtil.setAuthorizationCode(code);
-            logger.info("DEBUG: Credential successfully obtained from code." + code);
-            logger.info("DEBUG: Credential successfully obtained from code." + credential);
+            credential = GoogleAuthorizeUtil.refreshAccessToken(credential);
+//            logger.info("DEBUG: Credential successfully obtained from code." + code);
+//            logger.info("DEBUG: Credential successfully obtained from code." + credential);
             importService.updateDatabaseFromSpreadSheetsFile(credential);
             logger.info("DEBUG: Data successfully imported from Google Spread Sheets.");
 //            String responseMessage = "Data successfully imported from Google Spread Sheets. <a href=\"http://localhost:4200/\">Click here to go back.</a>";
