@@ -39,6 +39,9 @@ public class GoogleDriveImagesConfig {
             String url = "https://www.googleapis.com/drive/v3/files?q=" + query + "&fields=files(id,name,webViewLink)&key=" + apiKey;
             HttpGet request = new HttpGet(url);
 
+            System.out.println("Using API Key: " + apiKey);
+            System.out.println("Request URL: " + url);
+
             try (CloseableHttpClient httpClient = HttpClients.createDefault();
                  CloseableHttpResponse response = httpClient.execute(request)) {
                 return EntityUtils.toString(response.getEntity());
