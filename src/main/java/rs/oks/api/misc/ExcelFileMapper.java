@@ -36,10 +36,13 @@ public class ExcelFileMapper {
 
     public static final String FILE_ID = "1GOtntCvuntlmqAFMmkPDA3PsmQJt8nXJaiC2Ows_bvE";
 
+    public static final String FILE_ID_ABOUT_US = "";
+    public static final String FILE_ID_ABOUT_CAMP = "";
+
     public static GoogleSpreadSheetsReadingResult readContentFromGoogleSpreadSheets(Credential credential) throws GeneralSecurityException, IOException, ExecutionException, InterruptedException {
 
         // Get all sheets from the spreadsheet
-        Sheets file = GoogleSheetsServiceUtil.getSheets();
+        Sheets file = GoogleSheetsServiceUtil.getSheets(credential);
         Spreadsheet spreadsheet = file.spreadsheets().get(FILE_ID).execute();
         List<Sheet> sheets = spreadsheet.getSheets();
 

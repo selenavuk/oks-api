@@ -26,16 +26,20 @@ import java.util.logging.Logger;
 
 public class GoogleSheetsServiceUtil {
     private static final String APPLICATION_NAME = "oks-rest-api";
+    private static final String API_KEY = "AIzaSyCrcB-gufkUZM10CB0H1lQJoT6uJBLn_qc";
     private static final Logger logger = Logger.getLogger(ImportController.class.getName());
 
-    public static Sheets getSheets() throws IOException, GeneralSecurityException, ExecutionException, InterruptedException {
-        CompletableFuture<Credential> credential = GoogleAuthorizeUtil.authorizeAsync();
+    public static Sheets getSheets(Credential c) throws IOException, GeneralSecurityException, ExecutionException, InterruptedException {
+        //CompletableFuture<Credential> credential = GoogleAuthorizeUtil.authorizeAsync();
+        // return this comment if authorization not working
+
         return new Sheets
                 .Builder(
                         GoogleNetHttpTransport.newTrustedTransport(),
                         JacksonFactory.getDefaultInstance(),
-                        credential.get())
+                        c)
                 .setApplicationName(APPLICATION_NAME)
+                .setGoogleClientRequestInitializer(request -> request.put("key", API_KEY))
                 .build();
     }
 
