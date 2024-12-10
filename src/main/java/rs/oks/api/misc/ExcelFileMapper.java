@@ -50,7 +50,7 @@ public class ExcelFileMapper {
         List<String> googleSpreadSheetNamesToImport = getGoogleSpreadSheetNamesToImport(sheets);
 
         // Group sheets by age group
-        Pattern pattern = Pattern.compile("(mladja1|mladja2|srednja|starija)");
+        Pattern pattern = Pattern.compile("(mladja1|mladja2|srednja|starija|predtakmičarke)");
         Map<String, List<String>> groupedSpreadSheetNames = googleSpreadSheetNamesToImport.stream()
                 .collect(Collectors.groupingBy(name -> {
                     Matcher matcher = pattern.matcher(name);
@@ -58,7 +58,7 @@ public class ExcelFileMapper {
                 }));
 
         // Sort sheets in groups by month and year
-        Pattern datePattern = Pattern.compile("(\\d{2}_\\d{4})_(mladja1|mladja2|srednja|starija)");
+        Pattern datePattern = Pattern.compile("(\\d{2}_\\d{4})_(mladja1|mladja2|srednja|starija|predtakmičarke)");
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MM_yyyy");
         Map<String, List<String>> sortedGroupedSpreadSheetNames = groupedSpreadSheetNames.entrySet().stream()
                 .collect(Collectors.toMap(
@@ -100,7 +100,7 @@ public class ExcelFileMapper {
 
     public static List<String> getGoogleSpreadSheetNamesToImport(List<Sheet> sheets) {
         List<String> googleSpreadSheetNames = new ArrayList<>();
-        String regex = "\\d{2}_\\d{4}_(mladja1|mladja2|srednja|starija)";
+        String regex = "\\d{2}_\\d{4}_(mladja1|mladja2|srednja|starija|predtakmičarke)";
 
         for (Sheet sheet : sheets) {
             String sheetName = sheet.getProperties().getTitle();
@@ -177,9 +177,13 @@ public class ExcelFileMapper {
     private static String getFieldValueFromRow(List<Object> row, List<String> labels, String label) {
         try {
             if (label.equals(Labels.ACCESS_CARD)) {
-                return row.get(getIndexOfLabel(labels, label)).toString().equalsIgnoreCase("da") ? "DA" : "NE";
+//                return row.get(getIndexOfLabel(labels, label)).toString().equalsIgnoreCase("da") ? "DA" : "NE";
+                Object value = row.get(getIndexOfLabel(labels, label));
+                return (value != null && value.toString().equalsIgnoreCase("da")) ? "DA" : "NE";
             } else {
-                return row.get(getIndexOfLabel(labels, label)).toString();
+//                return row.get(getIndexOfLabel(labels, label)).toString();
+                Object value = row.get(getIndexOfLabel(labels, label));
+                return value != null ? value.toString() : "";  // Return empty string if value is null
             }
         } catch (IndexOutOfBoundsException e) {
             return "";
